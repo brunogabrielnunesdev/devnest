@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: devnest
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/devnest}
+    username: ${DB_USERNAME:devnest}
+    password: ${DB_PASSWORD:devnest}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate

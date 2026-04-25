@@ -1,0 +1,40 @@
+package com.devnest.course.domain;
+
+import com.devnest.shared.domain.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Getter
+@Setter
+@Table(name = "lessons")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Lesson extends BaseEntity {
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "module_id", nullable = false)
+	private CourseModule module;
+
+	@Column(nullable = false, length = 160)
+	private String title;
+
+	@Column(columnDefinition = "text")
+	private String description;
+
+	@Column(columnDefinition = "text")
+	private String content;
+
+	@Column(name = "video_url")
+	private String videoUrl;
+
+	@Column(nullable = false)
+	private Integer position;
+}

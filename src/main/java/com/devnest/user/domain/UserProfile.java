@@ -46,4 +46,11 @@ public class UserProfile extends BaseEntity {
 
 	@Column(length = 120)
 	private String location;
+
+	static UserProfile create(User user, String displayName) {
+		UserProfile profile = new UserProfile();
+		profile.user = user;
+		profile.displayName = displayName;
+		return profile;
+	}
 }

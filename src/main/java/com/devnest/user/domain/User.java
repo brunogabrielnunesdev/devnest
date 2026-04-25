@@ -37,4 +37,14 @@ public class User extends BaseEntity {
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Setter(AccessLevel.PACKAGE)
 	private UserProfile profile;
+
+	public static User createStudent(String email, String passwordHash, String displayName) {
+		User user = new User();
+		user.email = email;
+		user.passwordHash = passwordHash;
+		user.role = UserRole.STUDENT;
+		user.status = UserStatus.ACTIVE;
+		user.profile = UserProfile.create(user, displayName);
+		return user;
+	}
 }

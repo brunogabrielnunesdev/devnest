@@ -29,6 +29,15 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
 	}
 
+	@ExceptionHandler(UnauthorizedException.class)
+	public ResponseEntity<ApiError> handleUnauthorizedException(
+		UnauthorizedException exception,
+		HttpServletRequest request
+	) {
+		ApiError error = createError(HttpStatus.UNAUTHORIZED, request);
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiError> handleMethodArgumentNotValidException(
 		MethodArgumentNotValidException exception,
@@ -36,6 +45,24 @@ public class GlobalExceptionHandler {
 	) {
 		ApiError error = createError(HttpStatus.BAD_REQUEST, request);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+	}
+
+	@ExceptionHandler(ForbiddenException.class)
+	public ResponseEntity<ApiError> handleForbiddenException(
+		ForbiddenException exception,
+		HttpServletRequest request
+	) {
+		ApiError error = createError(HttpStatus.FORBIDDEN, request);
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+	}
+
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<ApiError> handleResourceNotFoundException(
+		ResourceNotFoundException exception,
+		HttpServletRequest request
+	) {
+		ApiError error = createError(HttpStatus.NOT_FOUND, request);
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
 	}
 
 	private ApiError createError(HttpStatus status, HttpServletRequest request) {

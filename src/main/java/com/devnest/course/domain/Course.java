@@ -19,7 +19,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "courses")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Course extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -38,4 +38,24 @@ public class Course extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private CourseStatus status;
+
+	public static Course draft(User teacher, String title, String description, String level) {
+		Course course = new Course();
+		course.teacher = teacher;
+		course.title = title;
+		course.description = description;
+		course.level = level;
+		course.status = CourseStatus.DRAFT;
+		return course;
+	}
+
+	public void update(String title, String description, String level) {
+		this.title = title;
+		this.description = description;
+		this.level = level;
+	}
+
+	public void archive() {
+		this.status = CourseStatus.ARCHIVED;
+	}
 }

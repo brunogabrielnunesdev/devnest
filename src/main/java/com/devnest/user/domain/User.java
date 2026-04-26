@@ -39,10 +39,18 @@ public class User extends BaseEntity {
 	private UserProfile profile;
 
 	public static User createStudent(String email, String passwordHash, String displayName) {
+		return create(email, passwordHash, displayName, UserRole.STUDENT);
+	}
+
+	public static User createTeacher(String email, String passwordHash, String displayName) {
+		return create(email, passwordHash, displayName, UserRole.TEACHER);
+	}
+
+	private static User create(String email, String passwordHash, String displayName, UserRole role) {
 		User user = new User();
 		user.email = email;
 		user.passwordHash = passwordHash;
-		user.role = UserRole.STUDENT;
+		user.role = role;
 		user.status = UserStatus.ACTIVE;
 		user.profile = UserProfile.create(user, displayName);
 		return user;

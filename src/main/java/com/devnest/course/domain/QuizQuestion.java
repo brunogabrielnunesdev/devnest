@@ -20,7 +20,7 @@ import lombok.Setter;
 	name = "quiz_questions",
 	uniqueConstraints = @UniqueConstraint(name = "uk_quiz_questions_quiz_position", columnNames = {"quiz_id", "position"})
 )
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class QuizQuestion extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)

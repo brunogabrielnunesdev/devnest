@@ -9,6 +9,7 @@ import com.devnest.course.dto.CourseCreateRequest;
 import com.devnest.course.dto.CourseUpdateRequest;
 import com.devnest.course.mapper.CourseMapper;
 import com.devnest.course.repository.CourseRepository;
+import com.devnest.course.service.CourseService;
 import com.devnest.shared.exception.ForbiddenException;
 import com.devnest.shared.exception.ResourceNotFoundException;
 import com.devnest.user.domain.User;

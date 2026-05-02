@@ -1,4 +1,4 @@
-package com.devnest.auth;
+package com.devnest.auth.service;
 
 import com.devnest.auth.dto.AuthResponse;
 import com.devnest.auth.dto.LoginRequest;

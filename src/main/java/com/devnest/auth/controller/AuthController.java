@@ -1,8 +1,9 @@
-package com.devnest.auth;
+package com.devnest.auth.controller;
 
 import com.devnest.auth.dto.AuthResponse;
 import com.devnest.auth.dto.LoginRequest;
 import com.devnest.auth.dto.RegisterRequest;
+import com.devnest.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

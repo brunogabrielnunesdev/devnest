@@ -1,9 +1,10 @@
-package com.devnest.course;
+package com.devnest.course.controller;
 
 import com.devnest.course.dto.CourseCreateRequest;
 import com.devnest.course.dto.CourseResponse;
 import com.devnest.course.dto.CourseUpdateRequest;
 import com.devnest.course.mapper.CourseMapper;
+import com.devnest.course.service.CourseService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +32,6 @@ public class CourseController {
 	public ResponseEntity<CourseResponse> create(@Valid @RequestBody CourseCreateRequest request) {
 		var course = courseMapper.toEntity(request);
 		var response = courseService.create(course);
-
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.devnest.auth.dto.AuthResponse;
 import com.devnest.auth.dto.LoginRequest;
 import com.devnest.auth.dto.RegisterRequest;
+import com.devnest.auth.service.AuthService;
 import com.devnest.shared.exception.ConflictException;
 import com.devnest.user.domain.UserRole;
 import com.devnest.user.domain.UserStatus;

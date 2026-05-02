@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "course_modules")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class CourseModule extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)

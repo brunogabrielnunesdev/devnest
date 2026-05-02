@@ -1,0 +1,841 @@
+﻿API CONTRACT SUMMARY - DEVNEST
+
+Base observed in controllers: relative routes from Spring controllers (no global prefix identified here).
+
+==================================================
+AUTH
+==================================================
+
+[POST] /auth/register
+Function: Register a new user and return authentication tokens.
+Request:
+{
+  "email": "string (email, max 320)",
+  "password": "string (8-72)",
+  "displayName": "string (max 80)"
+}
+Response 201:
+{
+  "accessToken": "string",
+  "refreshToken": "string"
+}
+
+[POST] /auth/login
+Function: Authenticate user and return authentication tokens.
+Request:
+{
+  "email": "string (email)",
+  "password": "string"
+}
+Response 200:
+{
+  "accessToken": "string",
+  "refreshToken": "string"
+}
+
+[POST] /auth/refresh
+Function: Refresh access/refresh token pair.
+Request:
+{
+  "refreshToken": "string"
+}
+Response 200:
+{
+  "accessToken": "string",
+  "refreshToken": "string"
+}
+
+==================================================
+PROFILE
+==================================================
+
+[GET] /perfil
+Function: Return authenticated user profile.
+Request: no body
+Response 200:
+{
+  "userId": "uuid",
+  "email": "string",
+  "role": "UserRole",
+  "status": "UserStatus",
+  "displayName": "string",
+  "fullName": "string",
+  "bio": "string",
+  "avatarUrl": "string",
+  "githubUrl": "string",
+  "linkedinUrl": "string",
+  "portfolioUrl": "string",
+  "location": "string",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[PATCH] /perfil
+Function: Update authenticated user profile.
+Request:
+{
+  "displayName": "string (required, max 80)",
+  "fullName": "string (max 120)",
+  "bio": "string (max 2000)",
+  "avatarUrl": "string (max 255)",
+  "githubUrl": "string (max 255)",
+  "linkedinUrl": "string (max 255)",
+  "portfolioUrl": "string (max 255)",
+  "location": "string (max 120)"
+}
+Response 200: same payload as GET /perfil
+
+[POST] /perfil/senha
+Function: Change authenticated user password.
+Request:
+{
+  "currentPassword": "string",
+  "newPassword": "string (8-72)"
+}
+Response 204: no body
+
+==================================================
+ADMIN
+==================================================
+
+[GET] /admin/metrics
+Function: Return admin dashboard metrics.
+Request: no body
+Response 200:
+{
+  "totalUsers": "number",
+  "totalCourses": "number",
+  "totalComments": "number"
+}
+
+[GET] /admin/users?query=&page=0&size=10
+Function: List users with pagination and optional search.
+Request: query params only
+Response 200:
+{
+  "content": [
+    {
+      "id": "uuid",
+      "email": "string",
+      "displayName": "string",
+      "fullName": "string",
+      "role": "UserRole",
+      "status": "UserStatus",
+      "createdAt": "datetime",
+      "updatedAt": "datetime"
+    }
+  ],
+  "page": "number",
+  "size": "number",
+  "totalElements": "number",
+  "totalPages": "number"
+}
+
+[PATCH] /admin/users/{id}/role
+Function: Change a user's role.
+Request:
+{
+  "role": "UserRole"
+}
+Response 200: AdminUserResponse
+
+[GET] /admin/courses?query=&page=0&size=10
+Function: List courses for administration.
+Request: query params only
+Response 200:
+{
+  "content": [
+    {
+      "id": "uuid",
+      "teacherId": "uuid",
+      "teacherName": "string",
+      "title": "string",
+      "description": "string",
+      "level": "string",
+      "status": "CourseStatus",
+      "archived": "boolean",
+      "createdAt": "datetime",
+      "updatedAt": "datetime"
+    }
+  ],
+  "page": "number",
+  "size": "number",
+  "totalElements": "number",
+  "totalPages": "number"
+}
+
+[GET] /admin/courses/{id}
+Function: Get course details for administration.
+Request: no body
+Response 200: AdminCourseResponse
+
+[PATCH] /admin/courses/{id}/archive
+Function: Archive a course.
+Request: no body
+Response 200: AdminCourseResponse
+
+[PATCH] /admin/courses/{id}/restore
+Function: Restore an archived course.
+Request: no body
+Response 200: AdminCourseResponse
+
+[DELETE] /admin/courses/{id}
+Function: Permanently delete a course.
+Request: no body
+Response 204: no body
+
+[GET] /admin/comments?query=&page=0&size=10
+Function: List comments for moderation/administration.
+Request: query params only
+Response 200:
+{
+  "content": [
+    {
+      "id": "uuid",
+      "lessonId": "uuid",
+      "lessonTitle": "string",
+      "courseId": "uuid",
+      "courseTitle": "string",
+      "studentId": "uuid",
+      "studentName": "string",
+      "content": "string",
+      "rating": "number",
+      "status": "CommentStatus",
+      "hidden": "boolean",
+      "moderationReason": "string",
+      "removedAt": "datetime",
+      "createdAt": "datetime",
+      "updatedAt": "datetime"
+    }
+  ],
+  "page": "number",
+  "size": "number",
+  "totalElements": "number",
+  "totalPages": "number"
+}
+
+[PATCH] /admin/comments/{id}/hide
+Function: Hide a comment.
+Request: no body
+Response 200: AdminCommentResponse
+
+[PATCH] /admin/comments/{id}/restore
+Function: Restore a hidden comment.
+Request: no body
+Response 200: AdminCommentResponse
+
+[GET] /admin/comment/lesson/retained
+Function: List retained lesson comments.
+Request: no body
+Response 200:
+[
+  {
+    "id": "uuid",
+    "content": "string",
+    "rating": "number",
+    "status": "CommentStatus",
+    "moderationReason": "string",
+    "studentId": "uuid",
+    "studentDisplayName": "string",
+    "courseId": "uuid",
+    "courseTitle": "string",
+    "lessonId": "uuid",
+    "lessonTitle": "string",
+    "removedAt": "datetime",
+    "createdAt": "datetime",
+    "updatedAt": "datetime"
+  }
+]
+
+[POST] /admin/comment/lesson/{commentId}/moderation
+Function: Moderate a retained lesson comment.
+Request:
+{
+  "moderationReason": "string"
+}
+Response 200: LessonCommentResponse
+
+[DELETE] /admin/comment/lesson/{commentId}
+Function: Delete retained lesson comment.
+Request: no body
+Response 204: no body
+
+==================================================
+TEACHER - COURSES / MODULES / LESSONS / QUIZZES
+==================================================
+
+[POST] /course
+Function: Create a course.
+Request:
+{
+  "title": "string (required, max 160)",
+  "description": "string",
+  "level": "string (max 40)"
+}
+Response 201:
+{
+  "id": "uuid",
+  "teacherId": "uuid",
+  "title": "string",
+  "description": "string",
+  "level": "string",
+  "status": "CourseStatus",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /course/my
+Function: List courses created by the authenticated teacher.
+Request: no body
+Response 200: CourseResponse[]
+
+[GET] /course/catalog
+Function: List published courses available in catalog.
+Request: no body
+Response 200: CourseResponse[]
+
+[GET] /course/catalog/{courseId}
+Function: Get published course by id from catalog.
+Request: no body
+Response 200: CourseResponse
+
+[GET] /course/{courseId}
+Function: Get teacher-owned course by id.
+Request: no body
+Response 200: CourseResponse
+
+[PUT] /course/{courseId}
+Function: Update a course.
+Request:
+{
+  "title": "string (required, max 160)",
+  "description": "string",
+  "level": "string (max 40)"
+}
+Response 200: CourseResponse
+
+[DELETE] /course/{courseId}
+Function: Delete a course.
+Request: no body
+Response 204: no body
+
+[POST] /course/{courseId}/publish
+Function: Publish a course.
+Request: no body
+Response 200: CourseResponse
+
+[POST] /course/{courseId}/module
+Function: Create a module inside a course.
+Request:
+{
+  "title": "string (required, max 160)",
+  "description": "string",
+  "position": "number"
+}
+Response 201:
+{
+  "id": "uuid",
+  "courseId": "uuid",
+  "title": "string",
+  "description": "string",
+  "position": "number",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /course/{courseId}/module
+Function: List modules from a course.
+Request: no body
+Response 200: CourseModuleResponse[]
+
+[GET] /course/{courseId}/module/{moduleId}
+Function: Get a module by id.
+Request: no body
+Response 200: CourseModuleResponse
+
+[PUT] /course/{courseId}/module/{moduleId}
+Function: Update a module.
+Request:
+{
+  "title": "string (required, max 160)",
+  "description": "string",
+  "position": "number"
+}
+Response 200: CourseModuleResponse
+
+[DELETE] /course/{courseId}/module/{moduleId}
+Function: Delete a module.
+Request: no body
+Response 204: no body
+
+[POST] /course/{courseId}/module/{moduleId}/lesson
+Function: Create a lesson in a module.
+Request:
+{
+  "title": "string (required, max 160)",
+  "description": "string",
+  "content": "string",
+  "videoUrl": "string",
+  "position": "number"
+}
+Response 201:
+{
+  "id": "uuid",
+  "moduleId": "uuid",
+  "title": "string",
+  "description": "string",
+  "content": "string",
+  "videoUrl": "string",
+  "position": "number",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /course/{courseId}/module/{moduleId}/lesson
+Function: List lessons from a module.
+Request: no body
+Response 200: LessonResponse[]
+
+[GET] /course/{courseId}/module/{moduleId}/lesson/{lessonId}
+Function: Get lesson by id.
+Request: no body
+Response 200: LessonResponse
+
+[PUT] /course/{courseId}/module/{moduleId}/lesson/{lessonId}
+Function: Update a lesson.
+Request:
+{
+  "title": "string (required, max 160)",
+  "description": "string",
+  "content": "string",
+  "videoUrl": "string",
+  "position": "number"
+}
+Response 200: LessonResponse
+
+[DELETE] /course/{courseId}/module/{moduleId}/lesson/{lessonId}
+Function: Delete a lesson.
+Request: no body
+Response 204: no body
+
+[POST] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz
+Function: Create quiz for a lesson.
+Request:
+{
+  "title": "string (required, max 160)",
+  "passingScore": "number",
+  "maxAttempts": "number",
+  "maxQuestions": "number"
+}
+Response 201:
+{
+  "id": "uuid",
+  "lessonId": "uuid",
+  "title": "string",
+  "passingScore": "number",
+  "maxAttempts": "number",
+  "maxQuestions": "number",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz
+Function: Get quiz for a lesson.
+Request: no body
+Response 200: QuizResponse
+
+[PUT] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz
+Function: Update lesson quiz.
+Request:
+{
+  "title": "string (required, max 160)",
+  "passingScore": "number",
+  "maxAttempts": "number",
+  "maxQuestions": "number"
+}
+Response 200: QuizResponse
+
+[DELETE] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz
+Function: Delete lesson quiz.
+Request: no body
+Response 204: no body
+
+[POST] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz/question
+Function: Create a quiz question.
+Request:
+{
+  "statement": "string",
+  "position": "number"
+}
+Response 201:
+{
+  "id": "uuid",
+  "quizId": "uuid",
+  "statement": "string",
+  "position": "number",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz/question
+Function: List quiz questions.
+Request: no body
+Response 200: QuizQuestionResponse[]
+
+[GET] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz/question/{questionId}
+Function: Get quiz question by id.
+Request: no body
+Response 200: QuizQuestionResponse
+
+[PUT] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz/question/{questionId}
+Function: Update quiz question.
+Request:
+{
+  "statement": "string",
+  "position": "number"
+}
+Response 200: QuizQuestionResponse
+
+[DELETE] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz/question/{questionId}
+Function: Delete quiz question.
+Request: no body
+Response 204: no body
+
+[POST] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz/question/{questionId}/option
+Function: Create a quiz option.
+Request:
+{
+  "text": "string",
+  "correct": "boolean",
+  "position": "number"
+}
+Response 201:
+{
+  "id": "uuid",
+  "questionId": "uuid",
+  "text": "string",
+  "correct": "boolean",
+  "position": "number",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz/question/{questionId}/option
+Function: List quiz options of a question.
+Request: no body
+Response 200: QuizOptionResponse[]
+
+[GET] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz/question/{questionId}/option/{optionId}
+Function: Get quiz option by id.
+Request: no body
+Response 200: QuizOptionResponse
+
+[PUT] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz/question/{questionId}/option/{optionId}
+Function: Update quiz option.
+Request:
+{
+  "text": "string",
+  "correct": "boolean",
+  "position": "number"
+}
+Response 200: QuizOptionResponse
+
+[DELETE] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/quiz/question/{questionId}/option/{optionId}
+Function: Delete quiz option.
+Request: no body
+Response 204: no body
+
+[POST] /course/{courseId}/module/{moduleId}/lesson/{lessonId}/comment/{commentId}/moderation
+Function: Teacher moderates a lesson comment.
+Request:
+{
+  "moderationReason": "string"
+}
+Response 200:
+{
+  "id": "uuid",
+  "lessonId": "uuid",
+  "studentId": "uuid",
+  "studentDisplayName": "string",
+  "content": "string",
+  "rating": "number",
+  "status": "CommentStatus",
+  "moderationReason": "string",
+  "removedBy": "uuid",
+  "removedAt": "datetime",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /teacher/metrics
+Function: Return teacher dashboard metrics.
+Request: no body
+Response 200:
+{
+  "totalCoursesCreated": "number",
+  "totalModules": "number",
+  "totalLessons": "number",
+  "totalStudentsEnrolled": "number",
+  "averageCourseRating": "number",
+  "totalCommentsReceived": "number",
+  "totalQuizzesCreated": "number"
+}
+
+==================================================
+STUDENT - LEARNING / QUIZZES / COMMENTS
+==================================================
+
+[POST] /course/{courseId}/enrollment
+Function: Enroll authenticated student in a course.
+Request: no body
+Response 201:
+{
+  "id": "uuid",
+  "courseId": "uuid",
+  "studentId": "uuid",
+  "status": "EnrollmentStatus",
+  "enrolledAt": "datetime",
+  "completedAt": "datetime",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /course/enrollment
+Function: List authenticated student's enrollments.
+Request: no body
+Response 200: CourseEnrollmentResponse[]
+
+[GET] /course/{courseId}/enrollment
+Function: Get authenticated student's enrollment in a specific course.
+Request: no body
+Response 200: CourseEnrollmentResponse
+
+[POST] /course/{courseId}/lesson/{lessonId}/progress
+Function: Mark lesson as completed.
+Request: no body
+Response 200:
+{
+  "id": "uuid",
+  "lessonId": "uuid",
+  "studentId": "uuid",
+  "completed": "boolean",
+  "completedAt": "datetime",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /course/{courseId}/progress
+Function: Return student's course progress summary.
+Request: no body
+Response 200:
+{
+  "courseId": "uuid",
+  "studentId": "uuid",
+  "enrollmentStatus": "EnrollmentStatus",
+  "totalLessons": "number",
+  "completedLessons": "number"
+}
+
+[GET] /course/{courseId}/lesson/{lessonId}/quiz
+Function: Return student-safe quiz details with questions/options.
+Request: no body
+Response 200:
+{
+  "id": "uuid",
+  "lessonId": "uuid",
+  "title": "string",
+  "passingScore": "number",
+  "maxAttempts": "number",
+  "maxQuestions": "number",
+  "questions": [
+    {
+      "id": "uuid",
+      "statement": "string",
+      "position": "number",
+      "options": [
+        {
+          "id": "uuid",
+          "text": "string",
+          "position": "number"
+        }
+      ]
+    }
+  ]
+}
+
+[POST] /course/{courseId}/lesson/{lessonId}/quiz/attempts
+Function: Submit quiz attempt.
+Request:
+{
+  "answers": [
+    {
+      "questionId": "uuid",
+      "selectedOptionId": "uuid"
+    }
+  ]
+}
+Response 201:
+{
+  "id": "uuid",
+  "quizId": "uuid",
+  "studentId": "uuid",
+  "attemptNumber": "number",
+  "score": "number",
+  "passed": "boolean",
+  "remainingAttempts": "number",
+  "reviewAvailable": "boolean",
+  "answers": [
+    {
+      "questionId": "uuid",
+      "selectedOptionId": "uuid",
+      "correct": "boolean"
+    }
+  ],
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /course/{courseId}/lesson/{lessonId}/quiz/attempts
+Function: List student's quiz attempts for the lesson.
+Request: no body
+Response 200: QuizAttemptResponse[]
+
+[POST] /course/{courseId}/lesson/{lessonId}/comment
+Function: Create a lesson comment and rating.
+Request:
+{
+  "content": "string",
+  "rating": "number (1-10)"
+}
+Response 201:
+{
+  "id": "uuid",
+  "lessonId": "uuid",
+  "studentId": "uuid",
+  "studentDisplayName": "string",
+  "content": "string",
+  "rating": "number",
+  "status": "CommentStatus",
+  "moderationReason": "string",
+  "removedBy": "uuid",
+  "removedAt": "datetime",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /course/{courseId}/lesson/{lessonId}/comment
+Function: List visible lesson comments.
+Request: no body
+Response 200: LessonCommentResponse[]
+
+[GET] /student/metrics
+Function: Return student dashboard metrics.
+Request: no body
+Response 200:
+{
+  "totalCoursesEnrolled": "number",
+  "totalLessonsCompleted": "number",
+  "averageCourseProgress": "number",
+  "totalQuizzesCompleted": "number",
+  "averageQuizAccuracy": "number",
+  "totalCommentsMade": "number"
+}
+
+==================================================
+PROJECTS
+==================================================
+
+[POST] /project
+Function: Create a project.
+Request:
+{
+  "title": "string (required, max 160)",
+  "description": "string",
+  "visibility": "ProjectVisibility"
+}
+Response 201:
+{
+  "id": "uuid",
+  "ownerId": "uuid",
+  "title": "string",
+  "description": "string",
+  "status": "ProjectStatus",
+  "visibility": "ProjectVisibility",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /project/my
+Function: List projects of authenticated user.
+Request: no body
+Response 200: ProjectResponse[]
+
+[GET] /project/{projectId}
+Function: Get project by id.
+Request: no body
+Response 200: ProjectResponse
+
+[PUT] /project/{projectId}
+Function: Update project.
+Request:
+{
+  "title": "string (required, max 160)",
+  "description": "string",
+  "status": "ProjectStatus",
+  "visibility": "ProjectVisibility"
+}
+Response 200: ProjectResponse
+
+[DELETE] /project/{projectId}
+Function: Delete project.
+Request: no body
+Response 204: no body
+
+[POST] /project/{projectId}/update
+Function: Create an update/post for a project.
+Request:
+{
+  "title": "string (required, max 160)",
+  "content": "string (required)"
+}
+Response 201:
+{
+  "id": "uuid",
+  "projectId": "uuid",
+  "title": "string",
+  "content": "string",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+
+[GET] /project/{projectId}/update
+Function: List updates of a project.
+Request: no body
+Response 200: ProjectUpdateResponse[]
+
+[GET] /project/{projectId}/update/{updateId}
+Function: Get a specific project update.
+Request: no body
+Response 200: ProjectUpdateResponse
+
+[PUT] /project/{projectId}/update/{updateId}
+Function: Update a project update.
+Request:
+{
+  "title": "string (required, max 160)",
+  "content": "string (required)"
+}
+Response 200: ProjectUpdateResponse
+
+[DELETE] /project/{projectId}/update/{updateId}
+Function: Delete a project update.
+Request: no body
+Response 204: no body
+
+==================================================
+NOTES
+==================================================
+
+1. Endpoint security inferred from @PreAuthorize annotations in controllers.
+2. Several routes share the same path but differ by role and response payload, especially quiz endpoints for teacher vs student.
+3. Enum values (UserRole, UserStatus, CourseStatus, CommentStatus, EnrollmentStatus, ProjectStatus, ProjectVisibility) were referenced by type name; explicit enum members were not expanded in this summary.

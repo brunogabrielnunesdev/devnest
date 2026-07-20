@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: devnest
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${URL_DB}
+    username: ${$USER_DB}
+    password: ${PASSWORD_DB}
+    jpa:
+     open-in-view: false
+     hibernate:
+       ddl-auto: update
+  flyway:
+    enabled: true
+  logging:
+    level:
+      org.postgresql: TRACE
+      com.zaxxer.hikari: DEBUG
+devnest:
+  security:
+    jwt-secret: ${JWT_SECRET}
+  cors:
+    allowed-origins:
+      - ${FRONTEND_URL}
+      - http://127.0.0.1:5173

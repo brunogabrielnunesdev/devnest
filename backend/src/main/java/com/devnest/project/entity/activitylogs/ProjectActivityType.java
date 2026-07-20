@@ -1,0 +1,16 @@
+package com.devnest.project.entity.activitylogs;
+
+public enum ProjectActivityType {
+	PROJECT_CREATED,
+	PROJECT_UPDATED,
+	TASK_CREATED,
+	TASK_UPDATED,
+	TASK_DONE,
+	TASK_DELETED,
+	NOTE_CREATED,
+	NOTE_UPDATED,
+	NOTE_DELETED,
+	MEMBER_ADDED,
+	MEMBER_UPDATED,
+	MEMBER_REMOVED
+}

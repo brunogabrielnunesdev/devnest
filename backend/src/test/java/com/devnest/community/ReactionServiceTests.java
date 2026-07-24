@@ -12,6 +12,7 @@ import com.devnest.community.entity.post.PostType;
 import com.devnest.community.entity.reaction.ReactionType;
 import com.devnest.community.exception.comment.CommentNotFoundException;
 import com.devnest.community.exception.post.PostNotFoundException;
+import com.devnest.community.exception.ratelimit.CommunityRateLimitExceededException;
 import com.devnest.community.repository.reaction.ReactionRepository;
 import com.devnest.community.service.comment.CommentService;
 import com.devnest.community.service.forum.ForumService;
@@ -35,7 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @TestPropertySource(properties = {
 		"devnest.community.content-filter.rule-version=test-reaction-filter-v1",
-		"devnest.community.content-filter.bad-words[0]=idiota"
+		"devnest.community.content-filter.bad-words[0]=idiota",
+		"devnest.community.limits.reactions-per-minute=3"
 })
 class ReactionServiceTests {
 
@@ -138,6 +140,26 @@ class ReactionServiceTests {
 				postId,
 				new ReactionRequest(ReactionType.LIKE)
 		)).isInstanceOf(PostNotFoundException.class);
+	}
+
+	@Test
+	void fourthReactionChangeWithinOneMinuteIsRateLimited() {
+		UUID firstPost = createPost("rate-limit-one");
+		UUID secondPost = createPost("rate-limit-two");
+		UUID thirdPost = createPost("rate-limit-three");
+		UUID fourthPost = createPost("rate-limit-four");
+		authenticate(saveStudent("limited-reactor"));
+
+		reactionService.reactToPost(firstPost, new ReactionRequest(ReactionType.LIKE));
+		reactionService.reactToPost(secondPost, new ReactionRequest(ReactionType.HELPFUL));
+		reactionService.reactToPost(thirdPost, new ReactionRequest(ReactionType.CELEBRATE));
+
+		assertThatThrownBy(() -> reactionService.reactToPost(
+				fourthPost,
+				new ReactionRequest(ReactionType.INSIGHTFUL)
+		))
+				.isInstanceOf(CommunityRateLimitExceededException.class)
+				.hasMessage("Rate limit exceeded for reactions: maximum 3 per minute.");
 	}
 
 	private UUID createPost(String prefix) {

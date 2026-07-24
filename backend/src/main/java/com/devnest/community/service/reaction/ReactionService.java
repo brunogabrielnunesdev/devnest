@@ -17,6 +17,7 @@ import com.devnest.community.repository.post.PostRepository;
 import com.devnest.community.repository.reaction.ReactionCount;
 import com.devnest.community.repository.reaction.ReactionRepository;
 import com.devnest.community.service.access.AccessService;
+import com.devnest.community.service.ratelimit.CommunityRateLimitService;
 import com.devnest.identity.entity.User;
 import com.devnest.community.service.userrelation.UserRelationAccessService;
 import java.util.EnumMap;
@@ -38,6 +39,7 @@ public class ReactionService {
 	private final ReactionRepository reactionRepository;
 	private final ReactionMapper reactionMapper;
 	private final UserRelationAccessService userRelationAccessService;
+	private final CommunityRateLimitService rateLimitService;
 
 	@Transactional
 	public ReactionResponse reactToPost(UUID postId, ReactionRequest request) {
@@ -45,8 +47,14 @@ public class ReactionService {
 		Post post = findActivePost(postId);
 		userRelationAccessService.validateInteraction(user.getId(), post.getAuthor().getId());
 		Reaction reaction = reactionRepository.findByUserIdAndPostId(user.getId(), postId)
-				.map(existing -> changeType(existing, request.type()))
-				.orElseGet(() -> Reaction.forPost(user, post, request.type()));
+				.orElse(null);
+		if (reaction != null && reaction.getType() == request.type()) {
+			return reactionMapper.toResponse(reaction);
+		}
+		rateLimitService.validateReactionChange(user.getId());
+		reaction = reaction == null
+				? Reaction.forPost(user, post, request.type())
+				: changeType(reaction, request.type());
 		return reactionMapper.toResponse(save(reaction));
 	}
 
@@ -56,8 +64,14 @@ public class ReactionService {
 		Comment comment = findActiveComment(commentId);
 		userRelationAccessService.validateInteraction(user.getId(), comment.getAuthor().getId());
 		Reaction reaction = reactionRepository.findByUserIdAndCommentId(user.getId(), commentId)
-				.map(existing -> changeType(existing, request.type()))
-				.orElseGet(() -> Reaction.forComment(user, comment, request.type()));
+				.orElse(null);
+		if (reaction != null && reaction.getType() == request.type()) {
+			return reactionMapper.toResponse(reaction);
+		}
+		rateLimitService.validateReactionChange(user.getId());
+		reaction = reaction == null
+				? Reaction.forComment(user, comment, request.type())
+				: changeType(reaction, request.type());
 		return reactionMapper.toResponse(save(reaction));
 	}
 

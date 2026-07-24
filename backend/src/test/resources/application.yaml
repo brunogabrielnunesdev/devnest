@@ -15,3 +15,9 @@ devnest:
   cors:
     allowed-origins:
       - http://localhost:5173
+  community:
+    limits:
+      posts-per-24-hours: 5
+      comments-per-minute: 20
+      reactions-per-minute: 60
+      duplicate-content-window-minutes: 10

@@ -1,5 +1,6 @@
 package com.devnest.community.service.post;
 
+import com.devnest.community.config.CommunityLimitsProperties;
 import com.devnest.community.dto.post.PostRequest;
 import com.devnest.community.dto.post.PostResponse;
 import com.devnest.community.dto.post.PostUpdateRequest;
@@ -31,7 +32,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,9 +50,7 @@ public class PostService {
 	private final PostMapper postMapper;
 	private final ContentFilter contentFilter;
 	private final Clock communityClock;
-
-	@Value("${devnest.community.limits.posts-per-24-hours:5}")
-	private int postsPer24Hours;
+	private final CommunityLimitsProperties limits;
 
 	@Transactional
 	public PostResponse create(UUID forumId, PostRequest request) {
@@ -161,7 +159,8 @@ public class PostService {
 
 	private void validatePostLimit(UUID authorId) {
 		OffsetDateTime windowStart = OffsetDateTime.now(communityClock).minusHours(24);
-		if (postRepository.countByAuthorIdAndCreatedAtGreaterThanEqual(authorId, windowStart) >= postsPer24Hours) {
+		if (postRepository.countByAuthorIdAndCreatedAtGreaterThanEqual(authorId, windowStart)
+				>= limits.getPostsPer24Hours()) {
 			throw new PostLimitExceededException();
 		}
 	}

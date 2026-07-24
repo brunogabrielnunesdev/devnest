@@ -11,6 +11,7 @@ import com.devnest.community.entity.post.ContentStatus;
 import com.devnest.community.entity.post.PostType;
 import com.devnest.community.exception.access.CommunityForbiddenException;
 import com.devnest.community.exception.comment.CommentUnavailableException;
+import com.devnest.community.exception.ratelimit.CommunityRateLimitExceededException;
 import com.devnest.community.repository.comment.CommentRepository;
 import com.devnest.community.repository.post.PostRepository;
 import com.devnest.community.service.comment.CommentService;
@@ -35,7 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @TestPropertySource(properties = {
 		"devnest.community.content-filter.rule-version=test-comment-filter-v1",
-		"devnest.community.content-filter.bad-words[0]=idiota"
+		"devnest.community.content-filter.bad-words[0]=idiota",
+		"devnest.community.limits.comments-per-minute=3"
 })
 class CommentServiceTests {
 
@@ -117,6 +119,22 @@ class CommentServiceTests {
 		assertThatThrownBy(() -> commentService.create(postId, new CommentRequest("Blocked")))
 				.isInstanceOf(CommentUnavailableException.class)
 				.hasMessage("This post does not accept comments.");
+	}
+
+	@Test
+	void fourthCommentWithinOneMinuteIsRateLimited() {
+		UUID postId = createPost("comment-rate-limit");
+		authenticate(saveStudent("limited-comment-author"));
+		for (int index = 1; index <= 3; index++) {
+			commentService.create(postId, new CommentRequest("Comment " + index));
+		}
+
+		assertThatThrownBy(() -> commentService.create(
+				postId,
+				new CommentRequest("Comment 4")
+		))
+				.isInstanceOf(CommunityRateLimitExceededException.class)
+				.hasMessage("Rate limit exceeded for comments: maximum 3 per minute.");
 	}
 
 	private UUID createPost(String prefix) {

@@ -13,6 +13,7 @@ import com.devnest.community.repository.post.PostRepository;
 import com.devnest.community.service.access.AccessService;
 import com.devnest.community.service.content.ContentFilter;
 import com.devnest.community.service.content.ContentFilterResult;
+import com.devnest.community.service.ratelimit.CommunityRateLimitService;
 import com.devnest.community.service.userrelation.UserRelationAccessService;
 import com.devnest.identity.entity.User;
 import java.time.Clock;
@@ -35,12 +36,14 @@ public class CommentService {
 	private final ContentFilter contentFilter;
 	private final Clock communityClock;
 	private final UserRelationAccessService userRelationAccessService;
+	private final CommunityRateLimitService rateLimitService;
 
 	@Transactional
 	public CommentResponse create(UUID postId, CommentRequest request) {
 		Post post = findInteractivePost(postId);
 		User author = accessService.getAuthenticatedUser();
 		userRelationAccessService.validateInteraction(author.getId(), post.getAuthor().getId());
+		rateLimitService.validateCommentCreation(author.getId());
 		Comment comment = Comment.create(post, author, request.content());
 		applyContentFilter(comment, request.content());
 		return commentMapper.toResponse(commentRepository.save(comment));

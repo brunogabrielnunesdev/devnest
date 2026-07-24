@@ -9,6 +9,7 @@ import com.devnest.community.exception.forum.ForumUnavailableException;
 import com.devnest.community.exception.post.PostLimitExceededException;
 import com.devnest.community.exception.post.PostNotFoundException;
 import com.devnest.community.exception.post.PostUnavailableException;
+import com.devnest.community.exception.ratelimit.CommunityRateLimitExceededException;
 import com.devnest.community.exception.reference.ReferenceNotFoundException;
 import com.devnest.community.exception.reaction.ReactionConflictException;
 import com.devnest.community.exception.slug.SlugConflictException;
@@ -61,6 +62,14 @@ public class ExceptionHandler {
 			HttpServletRequest request
 	) {
 		return createResponse(HttpStatus.FORBIDDEN, exception.getMessage(), request);
+	}
+
+	@org.springframework.web.bind.annotation.ExceptionHandler(CommunityRateLimitExceededException.class)
+	public ResponseEntity<ApiError> handleRateLimit(
+			CommunityRateLimitExceededException exception,
+			HttpServletRequest request
+	) {
+		return createResponse(HttpStatus.TOO_MANY_REQUESTS, exception.getMessage(), request);
 	}
 
 	private ResponseEntity<ApiError> createResponse(

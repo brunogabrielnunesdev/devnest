@@ -1,7 +1,7 @@
 package com.devnest.community.entity.post;
 
 import com.devnest.common.entity.BaseEntity;
-import com.devnest.community.entity.forum.CommunityForum;
+import com.devnest.community.entity.forum.Forum;
 import com.devnest.community.entity.tag.CommunityTag;
 import com.devnest.course.entity.course.Course;
 import com.devnest.identity.entity.User;
@@ -38,11 +38,11 @@ import lombok.NoArgsConstructor;
 		}
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommunityPost extends BaseEntity {
+public class Post extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "forum_id", nullable = false)
-	private CommunityForum forum;
+	private Forum forum;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "author_id", nullable = false)
@@ -64,11 +64,11 @@ public class CommunityPost extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 30)
-	private CommunityPostType type;
+	private PostType type;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 30)
-	private CommunityContentStatus status;
+	private ContentStatus status;
 
 	@Column(name = "comments_locked", nullable = false)
 	private boolean commentsLocked;
@@ -83,6 +83,12 @@ public class CommunityPost extends BaseEntity {
 	@Column(name = "removal_reason", length = 500)
 	private String removalReason;
 
+	@Column(name = "content_filter_rule_version", length = 100)
+	private String contentFilterRuleVersion;
+
+	@Column(name = "content_filter_matched_terms", columnDefinition = "text")
+	private String contentFilterMatchedTerms;
+
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = "community_post_tags",
@@ -96,16 +102,16 @@ public class CommunityPost extends BaseEntity {
 	)
 	private Set<CommunityTag> tags = new LinkedHashSet<>();
 
-	public static CommunityPost create(
-			CommunityForum forum,
+	public static Post create(
+			Forum forum,
 			User author,
 			String title,
 			String content,
-			CommunityPostType type,
+			PostType type,
 			Project project,
 			Course course
 	) {
-		CommunityPost post = new CommunityPost();
+		Post post = new Post();
 		post.forum = forum;
 		post.author = author;
 		post.title = title;
@@ -113,16 +119,16 @@ public class CommunityPost extends BaseEntity {
 		post.type = type;
 		post.project = project;
 		post.course = course;
-		post.status = CommunityContentStatus.ACTIVE;
+		post.status = ContentStatus.ACTIVE;
 		post.commentsLocked = false;
 		return post;
 	}
 
 	public void update(
-			CommunityForum forum,
+			Forum forum,
 			String title,
 			String content,
-			CommunityPostType type,
+			PostType type,
 			Project project,
 			Course course
 	) {
@@ -140,22 +146,36 @@ public class CommunityPost extends BaseEntity {
 	}
 
 	public void holdForReview() {
-		this.status = CommunityContentStatus.HELD_FOR_REVIEW;
+		this.status = ContentStatus.HELD_FOR_REVIEW;
+		this.commentsLocked = true;
+	}
+
+	public void applyContentFilter(boolean requiresReview, String ruleVersion, Set<String> matchedTerms) {
+		if (requiresReview) {
+			holdForReview();
+			this.contentFilterRuleVersion = ruleVersion;
+			this.contentFilterMatchedTerms = String.join("\n", matchedTerms);
+			return;
+		}
+		this.status = ContentStatus.ACTIVE;
+		this.commentsLocked = false;
+		this.contentFilterRuleVersion = null;
+		this.contentFilterMatchedTerms = null;
 	}
 
 	public void hide() {
-		this.status = CommunityContentStatus.HIDDEN;
+		this.status = ContentStatus.HIDDEN;
 	}
 
 	public void activate() {
-		this.status = CommunityContentStatus.ACTIVE;
+		this.status = ContentStatus.ACTIVE;
 		this.removedBy = null;
 		this.removedAt = null;
 		this.removalReason = null;
 	}
 
 	public void remove(User removedBy, String removalReason, OffsetDateTime removedAt) {
-		this.status = CommunityContentStatus.REMOVED;
+		this.status = ContentStatus.REMOVED;
 		this.commentsLocked = true;
 		this.removedBy = removedBy;
 		this.removalReason = removalReason;

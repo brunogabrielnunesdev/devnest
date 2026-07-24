@@ -1,6 +1,7 @@
 package com.devnest.identity.repository;
 
 import com.devnest.identity.entity.User;
+import com.devnest.identity.entity.UserStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +16,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 	boolean existsByEmail(String email);
 
 	Optional<User> findByEmail(String email);
+
+	Optional<User> findByIdAndStatus(UUID id, UserStatus status);
 
 	@Query(
 		value = """

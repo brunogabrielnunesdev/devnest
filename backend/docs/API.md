@@ -267,6 +267,39 @@ Tarefas usam os status `TODO`, `IN_PROGRESS` e `DONE` e as prioridades `LOW`, `M
 | GET | `/student/metrics` | Sim | `STUDENT` |
 | GET | `/admin/metrics` | Sim | `ADMIN` |
 
+### Comunidade
+
+| Metodo | Endpoint | Auth | Acesso |
+|---|---|---|---|
+| GET | `/community/forums` | Sim | usuario autenticado |
+| GET | `/community/forums/{slug}` | Sim | usuario autenticado |
+| GET | `/community/forums/{slug}/posts` | Sim | usuario autenticado |
+| GET | `/community/posts` | Sim | usuario autenticado |
+| GET | `/community/posts/{postId}` | Sim | usuario autenticado |
+| POST | `/community/forums/{forumId}/posts` | Sim | usuario autenticado |
+| PATCH | `/community/posts/{postId}` | Sim | autor ou `ADMIN` |
+| DELETE | `/community/posts/{postId}` | Sim | autor ou `ADMIN` |
+| GET | `/community/posts/{postId}/comments` | Sim | usuario autenticado |
+| POST | `/community/posts/{postId}/comments` | Sim | usuario autenticado |
+| PATCH | `/community/comments/{commentId}` | Sim | autor ou `ADMIN` |
+| DELETE | `/community/comments/{commentId}` | Sim | autor ou `ADMIN` |
+| PUT | `/community/posts/{postId}/reaction` | Sim | usuario autenticado |
+| DELETE | `/community/posts/{postId}/reaction` | Sim | usuario autenticado |
+| GET | `/community/posts/{postId}/reactions` | Sim | usuario autenticado |
+| PUT | `/community/comments/{commentId}/reaction` | Sim | usuario autenticado |
+| DELETE | `/community/comments/{commentId}/reaction` | Sim | usuario autenticado |
+| GET | `/community/comments/{commentId}/reactions` | Sim | usuario autenticado |
+| PUT | `/community/users/{userId}/block` | Sim | usuario autenticado |
+| DELETE | `/community/users/{userId}/block` | Sim | usuario autenticado |
+| GET | `/community/users/blocked` | Sim | usuario autenticado |
+| PUT | `/community/users/{userId}/mute` | Sim | usuario autenticado |
+| DELETE | `/community/users/{userId}/mute` | Sim | usuario autenticado |
+| GET | `/community/users/muted` | Sim | usuario autenticado |
+
+Posts e comentarios sinalizados pelo filtro de conteudo ficam retidos para revisao e nao aparecem nas listagens publicas. A exclusao de ambos e logica.
+Cada usuario mantem no maximo uma reacao por post ou comentario. Um novo `PUT` troca o tipo existente e `DELETE` e idempotente. Os tipos disponiveis sao `LIKE`, `HELPFUL`, `CELEBRATE` e `INSIGHTFUL`.
+Bloqueios impedem comentarios e reacoes entre os dois usuarios. Silenciamentos afetam apenas o feed de quem silenciou. Desbloqueio e dessilenciamento sao idempotentes.
+
 ### Admin
 
 | Metodo | Endpoint | Auth | Role |

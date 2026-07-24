@@ -23,3 +23,38 @@ devnest:
     allowed-origins:
       - ${FRONTEND_URL}
       - http://127.0.0.1:5173
+  community:
+    content-filter:
+      rule-version: pt-BR-v1
+      bad-words:
+        - cu
+        - pinto
+        - caralho
+        - buceta
+        - vagina
+        - pênis
+        - foder
+        - gostosa
+        - peituda
+        - rabuda
+        - imensa
+        - gorda
+        - gordo
+        - imenso
+        - baleia
+        - enorme
+        - redondo
+        - fudido
+        - miseravel
+      exceptions:
+        - porradaria
+      substitutions:
+        "0": o
+        "1": i
+        "3": e
+        "4": a
+        "5": s
+        "7": t
+        "@": a
+        "$": s
+        "v": u

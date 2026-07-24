@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 		indexes = @Index(name = "idx_community_forums_status_name", columnList = "status, name")
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommunityForum extends BaseEntity {
+public class Forum extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "created_by_id", nullable = false)
@@ -39,15 +39,15 @@ public class CommunityForum extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
-	private CommunityForumStatus status;
+	private ForumStatus status;
 
-	public static CommunityForum create(User createdBy, String name, String slug, String description) {
-		CommunityForum forum = new CommunityForum();
+	public static Forum create(User createdBy, String name, String slug, String description) {
+		Forum forum = new Forum();
 		forum.createdBy = createdBy;
 		forum.name = name;
 		forum.slug = slug;
 		forum.description = description;
-		forum.status = CommunityForumStatus.ACTIVE;
+		forum.status = ForumStatus.ACTIVE;
 		return forum;
 	}
 
@@ -58,14 +58,14 @@ public class CommunityForum extends BaseEntity {
 	}
 
 	public void archive() {
-		this.status = CommunityForumStatus.ARCHIVED;
+		this.status = ForumStatus.ARCHIVED;
 	}
 
 	public void restore() {
-		this.status = CommunityForumStatus.ACTIVE;
+		this.status = ForumStatus.ACTIVE;
 	}
 
 	public boolean isActive() {
-		return this.status == CommunityForumStatus.ACTIVE;
+		return this.status == ForumStatus.ACTIVE;
 	}
 }

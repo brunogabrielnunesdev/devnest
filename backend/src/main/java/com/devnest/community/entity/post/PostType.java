@@ -1,6 +1,6 @@
 package com.devnest.community.entity.post;
 
-public enum CommunityPostType {
+public enum PostType {
 	DISCUSSION,
 	QUESTION,
 	PROJECT_SHOWCASE,

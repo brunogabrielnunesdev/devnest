@@ -102,7 +102,7 @@ class AdminManagementServiceTests {
 		var restored = adminCourseService.restore(javaFixture.courseId());
 		assertThat(restored.archived()).isFalse();
 
-		courseService.delete(reactFixture.courseId());
+		adminCourseService.delete(reactFixture.courseId());
 		assertThat(courseRepository.findById(reactFixture.courseId())).isEmpty();
 	}
 

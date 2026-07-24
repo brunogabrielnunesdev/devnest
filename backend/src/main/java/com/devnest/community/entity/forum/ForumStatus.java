@@ -1,6 +1,6 @@
 package com.devnest.community.entity.forum;
 
-public enum CommunityForumStatus {
+public enum ForumStatus {
 	ACTIVE,
 	ARCHIVED
 }

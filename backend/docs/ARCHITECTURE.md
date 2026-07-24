@@ -68,6 +68,20 @@ Domínio de colaboração em projetos:
 
 O `ProjectAccessService` centraliza a busca do usuário atual e as permissões por projeto. Alterações relevantes geram registros por meio do `ActivityLogService`.
 
+### `com.devnest.community`
+
+Dominio da comunidade:
+
+- foruns administraveis e feed paginado;
+- posts associados a foruns, tags, projetos ou cursos;
+- comentarios paginados com ownership e exclusao logica;
+- reacoes em posts e comentarios com contadores agregados e unicidade no banco;
+- bloqueios bidirecionais para interacoes e silenciamento unilateral aplicado ao feed;
+- retencao de posts e comentarios pelo filtro de conteudo configuravel;
+- limite temporal de criacao de posts usando um `Clock` injetavel.
+
+O `AccessService` centraliza identidade, papel administrativo e ownership. Entidades com nomes compartilhados com outros dominios usam nomes explicitos de entidade e bean para evitar colisoes no contexto Spring e no JPA.
+
 ### `com.devnest.admin`
 
 Operações restritas a administradores:

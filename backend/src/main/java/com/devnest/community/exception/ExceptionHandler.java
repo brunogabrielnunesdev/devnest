@@ -4,6 +4,7 @@ import com.devnest.common.exception.ApiError;
 import com.devnest.community.exception.access.CommunityForbiddenException;
 import com.devnest.community.exception.comment.CommentNotFoundException;
 import com.devnest.community.exception.comment.CommentUnavailableException;
+import com.devnest.community.exception.duplicate.DuplicateContentException;
 import com.devnest.community.exception.forum.ForumNotFoundException;
 import com.devnest.community.exception.forum.ForumUnavailableException;
 import com.devnest.community.exception.post.PostLimitExceededException;
@@ -47,7 +48,8 @@ public class ExceptionHandler {
 			CommentUnavailableException.class,
 			PostUnavailableException.class,
 			ReactionConflictException.class,
-			SelfRelationException.class
+			SelfRelationException.class,
+			DuplicateContentException.class
 	})
 	public ResponseEntity<ApiError> handleConflict(
 			RuntimeException exception,

@@ -3,6 +3,7 @@ package com.devnest.community.repository.post;
 import com.devnest.community.entity.post.ContentStatus;
 import com.devnest.community.entity.post.Post;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -87,6 +88,11 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 	);
 
 	long countByAuthorIdAndCreatedAtGreaterThanEqual(
+			UUID authorId,
+			OffsetDateTime createdAfter
+	);
+
+	List<Post> findAllByAuthorIdAndCreatedAtGreaterThanEqual(
 			UUID authorId,
 			OffsetDateTime createdAfter
 	);

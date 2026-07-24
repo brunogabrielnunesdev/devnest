@@ -11,6 +11,7 @@ import com.devnest.community.entity.post.ContentStatus;
 import com.devnest.community.entity.post.PostType;
 import com.devnest.community.entity.tag.CommunityTag;
 import com.devnest.community.exception.access.CommunityForbiddenException;
+import com.devnest.community.exception.duplicate.DuplicateContentException;
 import com.devnest.community.exception.forum.ForumUnavailableException;
 import com.devnest.community.exception.post.PostLimitExceededException;
 import com.devnest.community.exception.post.PostNotFoundException;
@@ -185,6 +186,23 @@ class PostServiceTests {
 
 		assertThatThrownBy(() -> postService.create(forumId, request("Post 6", Set.of())))
 				.isInstanceOf(PostLimitExceededException.class);
+	}
+
+	@Test
+	void normalizedDuplicatePostIsRejectedWithinConfiguredWindow() {
+		UUID forumId = createForum("duplicate-post");
+		authenticate(saveStudent("duplicate-post-author"));
+		postService.create(
+				forumId,
+				requestWithContent("Olá, Spring!", "Conteúdo de teste.", Set.of())
+		);
+
+		assertThatThrownBy(() -> postService.create(
+				forumId,
+				requestWithContent("  OLA SPRING  ", "conteudo   de teste", Set.of())
+		))
+				.isInstanceOf(DuplicateContentException.class)
+				.hasMessage("Duplicate post content was recently submitted.");
 	}
 
 	@Test

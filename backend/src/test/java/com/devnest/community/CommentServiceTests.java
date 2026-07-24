@@ -11,6 +11,7 @@ import com.devnest.community.entity.post.ContentStatus;
 import com.devnest.community.entity.post.PostType;
 import com.devnest.community.exception.access.CommunityForbiddenException;
 import com.devnest.community.exception.comment.CommentUnavailableException;
+import com.devnest.community.exception.duplicate.DuplicateContentException;
 import com.devnest.community.exception.ratelimit.CommunityRateLimitExceededException;
 import com.devnest.community.repository.comment.CommentRepository;
 import com.devnest.community.repository.post.PostRepository;
@@ -135,6 +136,20 @@ class CommentServiceTests {
 		))
 				.isInstanceOf(CommunityRateLimitExceededException.class)
 				.hasMessage("Rate limit exceeded for comments: maximum 3 per minute.");
+	}
+
+	@Test
+	void normalizedDuplicateCommentIsRejectedWithinConfiguredWindow() {
+		UUID postId = createPost("duplicate-comment");
+		authenticate(saveStudent("duplicate-comment-author"));
+		commentService.create(postId, new CommentRequest("Ótima explicação!"));
+
+		assertThatThrownBy(() -> commentService.create(
+				postId,
+				new CommentRequest("  OTIMA   explicacao ")
+		))
+				.isInstanceOf(DuplicateContentException.class)
+				.hasMessage("Duplicate comment content was recently submitted.");
 	}
 
 	private UUID createPost(String prefix) {

@@ -22,6 +22,8 @@ import com.devnest.community.repository.tag.TagRepository;
 import com.devnest.community.service.access.AccessService;
 import com.devnest.community.service.content.ContentFilter;
 import com.devnest.community.service.content.ContentFilterResult;
+import com.devnest.community.service.content.DuplicateContentService;
+import com.devnest.community.service.concurrency.CommunityActorLockService;
 import com.devnest.course.entity.course.Course;
 import com.devnest.course.repository.course.CourseRepository;
 import com.devnest.project.entity.project.Project;
@@ -51,11 +53,15 @@ public class PostService {
 	private final ContentFilter contentFilter;
 	private final Clock communityClock;
 	private final CommunityLimitsProperties limits;
+	private final DuplicateContentService duplicateContentService;
+	private final CommunityActorLockService actorLockService;
 
 	@Transactional
 	public PostResponse create(UUID forumId, PostRequest request) {
 		var author = accessService.getAuthenticatedUser();
 		Forum forum = findActiveForum(forumId);
+		actorLockService.lock(author.getId());
+		duplicateContentService.validatePost(author.getId(), request.title(), request.content());
 		validatePostLimit(author.getId());
 		Post post = Post.create(
 				forum,

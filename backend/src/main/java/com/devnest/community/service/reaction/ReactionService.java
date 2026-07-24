@@ -18,6 +18,7 @@ import com.devnest.community.repository.reaction.ReactionCount;
 import com.devnest.community.repository.reaction.ReactionRepository;
 import com.devnest.community.service.access.AccessService;
 import com.devnest.community.service.ratelimit.CommunityRateLimitService;
+import com.devnest.community.service.concurrency.CommunityActorLockService;
 import com.devnest.identity.entity.User;
 import com.devnest.community.service.userrelation.UserRelationAccessService;
 import java.util.EnumMap;
@@ -40,12 +41,14 @@ public class ReactionService {
 	private final ReactionMapper reactionMapper;
 	private final UserRelationAccessService userRelationAccessService;
 	private final CommunityRateLimitService rateLimitService;
+	private final CommunityActorLockService actorLockService;
 
 	@Transactional
 	public ReactionResponse reactToPost(UUID postId, ReactionRequest request) {
 		User user = accessService.getAuthenticatedUser();
 		Post post = findActivePost(postId);
 		userRelationAccessService.validateInteraction(user.getId(), post.getAuthor().getId());
+		actorLockService.lock(user.getId());
 		Reaction reaction = reactionRepository.findByUserIdAndPostId(user.getId(), postId)
 				.orElse(null);
 		if (reaction != null && reaction.getType() == request.type()) {
@@ -63,6 +66,7 @@ public class ReactionService {
 		User user = accessService.getAuthenticatedUser();
 		Comment comment = findActiveComment(commentId);
 		userRelationAccessService.validateInteraction(user.getId(), comment.getAuthor().getId());
+		actorLockService.lock(user.getId());
 		Reaction reaction = reactionRepository.findByUserIdAndCommentId(user.getId(), commentId)
 				.orElse(null);
 		if (reaction != null && reaction.getType() == request.type()) {

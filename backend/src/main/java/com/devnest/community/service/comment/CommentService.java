@@ -13,6 +13,8 @@ import com.devnest.community.repository.post.PostRepository;
 import com.devnest.community.service.access.AccessService;
 import com.devnest.community.service.content.ContentFilter;
 import com.devnest.community.service.content.ContentFilterResult;
+import com.devnest.community.service.content.DuplicateContentService;
+import com.devnest.community.service.concurrency.CommunityActorLockService;
 import com.devnest.community.service.ratelimit.CommunityRateLimitService;
 import com.devnest.community.service.userrelation.UserRelationAccessService;
 import com.devnest.identity.entity.User;
@@ -37,12 +39,16 @@ public class CommentService {
 	private final Clock communityClock;
 	private final UserRelationAccessService userRelationAccessService;
 	private final CommunityRateLimitService rateLimitService;
+	private final DuplicateContentService duplicateContentService;
+	private final CommunityActorLockService actorLockService;
 
 	@Transactional
 	public CommentResponse create(UUID postId, CommentRequest request) {
 		Post post = findInteractivePost(postId);
 		User author = accessService.getAuthenticatedUser();
 		userRelationAccessService.validateInteraction(author.getId(), post.getAuthor().getId());
+		actorLockService.lock(author.getId());
+		duplicateContentService.validateComment(author.getId(), request.content());
 		rateLimitService.validateCommentCreation(author.getId());
 		Comment comment = Comment.create(post, author, request.content());
 		applyContentFilter(comment, request.content());

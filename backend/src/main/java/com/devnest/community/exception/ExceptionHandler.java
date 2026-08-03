@@ -15,6 +15,8 @@ import com.devnest.community.exception.reference.ReferenceNotFoundException;
 import com.devnest.community.exception.reaction.ReactionConflictException;
 import com.devnest.community.exception.report.ReportConflictException;
 import com.devnest.community.exception.report.ReportNotFoundException;
+import com.devnest.community.exception.moderation.ModerationCaseNotFoundException;
+import com.devnest.community.exception.moderation.ModerationConflictException;
 import com.devnest.community.exception.slug.SlugConflictException;
 import com.devnest.community.exception.tag.TagNotFoundException;
 import com.devnest.community.exception.userrelation.SelfRelationException;
@@ -34,6 +36,7 @@ public class ExceptionHandler {
 			CommentNotFoundException.class,
 			PostNotFoundException.class,
 			ReportNotFoundException.class,
+			ModerationCaseNotFoundException.class,
 			TagNotFoundException.class,
 			ReferenceNotFoundException.class
 	})
@@ -53,7 +56,8 @@ public class ExceptionHandler {
 			ReactionConflictException.class,
 			SelfRelationException.class,
 			DuplicateContentException.class,
-			ReportConflictException.class
+			ReportConflictException.class,
+			ModerationConflictException.class
 	})
 	public ResponseEntity<ApiError> handleConflict(
 			RuntimeException exception,

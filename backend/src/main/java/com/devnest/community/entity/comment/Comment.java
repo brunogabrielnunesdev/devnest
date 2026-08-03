@@ -90,4 +90,15 @@ public class Comment extends BaseEntity {
 		this.removalReason = reason;
 		this.removedAt = removedAt;
 	}
+
+	public void hide() {
+		this.status = ContentStatus.HIDDEN;
+	}
+
+	public void activate() {
+		this.status = ContentStatus.ACTIVE;
+		this.removedBy = null;
+		this.removedAt = null;
+		this.removalReason = null;
+	}
 }

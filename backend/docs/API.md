@@ -303,6 +303,9 @@ Tarefas usam os status `TODO`, `IN_PROGRESS` e `DONE` e as prioridades `LOW`, `M
 | PATCH | `/admin/community/forums/{forumId}/restore` | Sim | `ADMIN` |
 | GET | `/admin/community/reports` | Sim | `ADMIN` |
 | PATCH | `/admin/community/reports/{reportId}` | Sim | `ADMIN` |
+| GET | `/admin/community/moderation/cases` | Sim | `ADMIN` |
+| GET | `/admin/community/moderation/cases/{caseId}/actions` | Sim | `ADMIN` |
+| POST | `/admin/community/moderation/cases/{caseId}/actions` | Sim | `ADMIN` |
 
 Posts e comentarios sinalizados pelo filtro de conteudo ficam retidos para revisao e nao aparecem nas listagens publicas. A exclusao de ambos e logica.
 Cada usuario mantem no maximo uma reacao por post ou comentario. Um novo `PUT` troca o tipo existente e `DELETE` e idempotente. Os tipos disponiveis sao `LIKE`, `HELPFUL`, `CELEBRATE` e `INSIGHTFUL`.
@@ -320,6 +323,8 @@ Protecoes operacionais implementadas:
 Ao exceder um rate limit, a API retorna `429 Too Many Requests`. Conteudo duplicado retorna `409 Conflict`.
 
 Uma denuncia aceita os motivos `SPAM`, `HARASSMENT`, `HATE_SPEECH`, `SEXUAL_CONTENT`, `VIOLENCE`, `MISINFORMATION` e `OTHER`. O mesmo usuario pode denunciar cada alvo apenas uma vez e nao pode denunciar o proprio conteudo. A fila administrativa pode ser filtrada por `PENDING`, `CONFIRMED` ou `DISMISSED`; toda decisao exige uma nota e registra administrador e data.
+
+Confirmar uma denuncia abre atomicamente um caso de moderacao. A fila de casos aceita filtro por `OPEN` ou `RESOLVED`. As acoes `HIDE`, `RESTORE`, `REMOVE`, `LOCK_COMMENTS`, `UNLOCK_COMMENTS` e `RESOLVE_CASE` exigem motivo e registram moderador, data, estado anterior e estado novo. Bloqueio de comentarios se aplica apenas a posts. Casos resolvidos nao aceitam novas acoes.
 
 ### Admin
 

@@ -13,7 +13,7 @@ API REST da plataforma DevNest para aprendizado, publicação de cursos e colabo
 - projetos colaborativos com membros, tarefas, notas, atualizações e log de atividades;
 - comunidade com fóruns, posts, comentários, reações, bloqueios e silenciamentos;
 - filtro de conteúdo, rate limits, detecção de duplicidade e proteção concorrente;
-- denúncias de conteúdo com fila e decisão administrativa auditável;
+- denúncias, casos de moderação e ações administrativas com auditoria de estado;
 - dashboards e métricas para administradores, professores e alunos.
 
 ## Stack

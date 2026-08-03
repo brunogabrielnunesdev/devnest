@@ -82,7 +82,9 @@ Dominio da comunidade:
 - eventos persistidos de rate limit para comentarios e reacoes;
 - deteccao deterministica de conteudo duplicado por autor;
 - bloqueio pessimista por ator para serializar operacoes concorrentes.
-- denuncias unicas por usuario e alvo, com fila administrativa paginada e decisao auditavel.
+- denuncias unicas por usuario e alvo, com fila administrativa paginada e decisao auditavel;
+- casos de moderacao abertos por denuncias confirmadas e acoes imutaveis com estado anterior e novo;
+- bloqueios pessimistas nos casos e conteudos para serializar decisoes administrativas concorrentes.
 
 O `AccessService` centraliza identidade, papel administrativo e ownership. O `CommunityActorLockService` bloqueia a linha do usuario durante operacoes sensiveis a concorrencia. `CommunityRateLimitService` registra eventos em `community_rate_limit_events`, enquanto `DuplicateContentService` compara uma representacao normalizada do conteudo recente. Entidades com nomes compartilhados com outros dominios usam nomes explicitos de entidade e bean para evitar colisoes no contexto Spring e no JPA.
 
@@ -139,7 +141,7 @@ Em execução normal:
 - Flyway aplica migrations versionadas em `src/main/resources/db/migration`;
 - a configuração JPA desabilita Open Session in View.
 
-As migrations cobrem o modelo inicial, versionamento de token, flags administrativas, capa de curso, recursos colaborativos de projetos, limites de quizzes e as tabelas da comunidade de `V7` a `V12`.
+As migrations cobrem o modelo inicial, versionamento de token, flags administrativas, capa de curso, recursos colaborativos de projetos, limites de quizzes e as tabelas da comunidade de `V7` a `V13`.
 
 Nos testes regulares, o sistema usa H2 em memória com compatibilidade PostgreSQL, `ddl-auto: create-drop` e Flyway desabilitado. Os cenários concorrentes e as migrations `V1` a `V11` também foram validados em PostgreSQL 16 descartável.
 

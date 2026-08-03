@@ -10,7 +10,7 @@ Este plano também está referenciado no [README principal](../README.md), que f
 
 ## Checklist de acompanhamento
 
-Atualizado em 24/07/2026, após a conclusão das proteções anti-spam e dos testes concorrentes.
+Atualizado em 03/08/2026, após a entrega dos casos e das ações de moderação auditáveis.
 
 Legenda:
 
@@ -68,7 +68,7 @@ Legenda:
 
 - [ ] Fechar as decisões bloqueantes da fase.
 - [x] Implementar denúncias e fila administrativa.
-- [ ] Implementar casos e ações de moderação auditáveis.
+- [x] Implementar casos e ações de moderação auditáveis.
 - [ ] Implementar trust score, sanções, recuperação e recursos.
 - [ ] Implementar lista interna de bloqueio.
 

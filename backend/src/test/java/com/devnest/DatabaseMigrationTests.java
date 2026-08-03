@@ -24,13 +24,35 @@ class DatabaseMigrationTests {
 					connection,
 					new ClassPathResource("db/migration/V7__create_community_forums_and_posts.sql")
 			);
+			ScriptUtils.executeSqlScript(
+					connection,
+					new ClassPathResource("db/migration/V8__create_community_comments.sql")
+			);
+			ScriptUtils.executeSqlScript(
+					connection,
+					new ClassPathResource("db/migration/V9__create_community_reactions.sql")
+			);
+			ScriptUtils.executeSqlScript(
+					connection,
+					new ClassPathResource("db/migration/V10__create_community_user_relations.sql")
+			);
+			ScriptUtils.executeSqlScript(
+					connection,
+					new ClassPathResource("db/migration/V11__create_community_rate_limit_events.sql")
+			);
+			ScriptUtils.executeSqlScript(
+					connection,
+					new ClassPathResource("db/migration/V12__create_community_reports.sql")
+			);
 
 			try (var statement = connection.createStatement();
 					var result = statement.executeQuery("select count(*) from information_schema.tables "
 							+ "where table_name in ('community_forums', 'community_tags', "
-							+ "'community_posts', 'community_post_tags')")) {
+							+ "'community_posts', 'community_post_tags', 'community_comments', "
+							+ "'community_reactions', 'community_user_blocks', 'community_user_mutes', "
+							+ "'community_rate_limit_events', 'community_reports')")) {
 				assertThat(result.next()).isTrue();
-				assertThat(result.getInt(1)).isEqualTo(4);
+				assertThat(result.getInt(1)).isEqualTo(10);
 			}
 		}
 	}

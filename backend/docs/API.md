@@ -295,10 +295,31 @@ Tarefas usam os status `TODO`, `IN_PROGRESS` e `DONE` e as prioridades `LOW`, `M
 | PUT | `/community/users/{userId}/mute` | Sim | usuario autenticado |
 | DELETE | `/community/users/{userId}/mute` | Sim | usuario autenticado |
 | GET | `/community/users/muted` | Sim | usuario autenticado |
+| POST | `/community/posts/{postId}/reports` | Sim | usuario autenticado |
+| POST | `/community/comments/{commentId}/reports` | Sim | usuario autenticado |
+| POST | `/admin/community/forums` | Sim | `ADMIN` |
+| PATCH | `/admin/community/forums/{forumId}` | Sim | `ADMIN` |
+| PATCH | `/admin/community/forums/{forumId}/archive` | Sim | `ADMIN` |
+| PATCH | `/admin/community/forums/{forumId}/restore` | Sim | `ADMIN` |
+| GET | `/admin/community/reports` | Sim | `ADMIN` |
+| PATCH | `/admin/community/reports/{reportId}` | Sim | `ADMIN` |
 
 Posts e comentarios sinalizados pelo filtro de conteudo ficam retidos para revisao e nao aparecem nas listagens publicas. A exclusao de ambos e logica.
 Cada usuario mantem no maximo uma reacao por post ou comentario. Um novo `PUT` troca o tipo existente e `DELETE` e idempotente. Os tipos disponiveis sao `LIKE`, `HELPFUL`, `CELEBRATE` e `INSIGHTFUL`.
 Bloqueios impedem comentarios e reacoes entre os dois usuarios. Silenciamentos afetam apenas o feed de quem silenciou. Desbloqueio e dessilenciamento sao idempotentes.
+
+Protecoes operacionais implementadas:
+
+- no maximo cinco posts por usuario em uma janela movel de 24 horas;
+- rate limit configuravel para criacao de comentarios e alteracoes de reacao;
+- repeticao idempotente da mesma reacao e remocoes nao consomem o rate limit;
+- posts e comentarios equivalentes do mesmo autor sao rejeitados dentro da janela de duplicidade;
+- a normalizacao de duplicidade ignora caixa, acentos, pontuacao e espacos repetidos;
+- operacoes do mesmo ator sao serializadas por bloqueio pessimista para preservar limites sob concorrencia.
+
+Ao exceder um rate limit, a API retorna `429 Too Many Requests`. Conteudo duplicado retorna `409 Conflict`.
+
+Uma denuncia aceita os motivos `SPAM`, `HARASSMENT`, `HATE_SPEECH`, `SEXUAL_CONTENT`, `VIOLENCE`, `MISINFORMATION` e `OTHER`. O mesmo usuario pode denunciar cada alvo apenas uma vez e nao pode denunciar o proprio conteudo. A fila administrativa pode ser filtrada por `PENDING`, `CONFIRMED` ou `DISMISSED`; toda decisao exige uma nota e registra administrador e data.
 
 ### Admin
 
@@ -332,6 +353,7 @@ Status tratados explicitamente:
 - `403 Forbidden`
 - `404 Not Found`
 - `409 Conflict`
+- `429 Too Many Requests`
 - `500 Internal Server Error`
 
 Exemplo:

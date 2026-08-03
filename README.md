@@ -57,6 +57,8 @@ No estado atual do projeto, os modulos principais incluem:
 - matricula e progresso do aluno
 - comentarios em aulas com moderacao
 - projetos e atualizacoes de projeto
+- comunidade com foruns, posts, comentarios e reacoes
+- bloqueio, silenciamento e protecoes contra spam na comunidade
 
 ## Regras de negocio importantes
 
@@ -67,6 +69,9 @@ Algumas regras relevantes ja implementadas:
 - o cadastro nao expoe explicitamente quando um email ja existe
 - a revisao detalhada do quiz so aparece quando o aluno passa ou esgota as tentativas
 - aulas com quiz exigem quiz aprovado para serem concluidas
+- posts possuem limite temporal protegido contra requisicoes concorrentes
+- comentarios e reacoes possuem rate limits configuraveis
+- conteudo duplicado recente e rejeitado por usuario
 
 ## Como executar o projeto
 
@@ -127,6 +132,7 @@ O backend esta organizado em modulos por dominio, como:
 - `profile`
 - `course`
 - `project`
+- `community`
 - `admin`
 - `common`
 
@@ -153,10 +159,10 @@ Hoje ele ja possui base funcional para ser tratado como MVP tecnico, mas ainda p
 
 ## Proximos passos sugeridos
 
-- revisar e padronizar nomenclaturas
-- alinhar contratos entre backend e frontend
-- documentar melhor fluxos principais
-- validar os cenarios centrais com perfil de professor e aluno
+- implementar denuncias e fila administrativa da comunidade
+- fechar as regras de trust score, sancoes e recursos
+- integrar os endpoints da comunidade ao frontend
+- validar sanitizacao HTML, URLs e queries principais
 
 ## Observacoes
 

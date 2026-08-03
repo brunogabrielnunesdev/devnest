@@ -11,6 +11,9 @@ API REST da plataforma DevNest para aprendizado, publicação de cursos e colabo
 - comentários em aulas e moderação por professores e administradores;
 - perfil do usuário e troca de senha;
 - projetos colaborativos com membros, tarefas, notas, atualizações e log de atividades;
+- comunidade com fóruns, posts, comentários, reações, bloqueios e silenciamentos;
+- filtro de conteúdo, rate limits, detecção de duplicidade e proteção concorrente;
+- denúncias de conteúdo com fila e decisão administrativa auditável;
 - dashboards e métricas para administradores, professores e alunos.
 
 ## Stack
@@ -33,6 +36,7 @@ com.devnest
 ├── admin       # administração de usuários, cursos, comentários e métricas
 ├── auth        # autenticação, JWT e configuração do Spring Security
 ├── common      # configuração, entidade-base e tratamento global de erros
+├── community   # fóruns, conteúdo, interações e proteções anti-spam
 ├── course      # cursos, conteúdo, quizzes, matrículas, progresso e comentários
 ├── identity    # usuário, papéis, status e persistência da identidade
 ├── profile     # perfil do usuário autenticado
@@ -48,7 +52,7 @@ Controllers definem o contrato HTTP, services concentram regras de negócio e au
 - [Comunidade](docs/COMMUNITY.md): requisitos, decisões de produto e backlog da comunidade.
 - [Plano de execução da comunidade](docs/COMMUNITY_EXECUTION_PLAN.md): fases, regras de negócio, migrations, testes e critérios de aceite.
 
-Os documentos da comunidade representam planejamento. Funcionalidades planejadas só passam para a documentação da API depois de implementadas e validadas.
+Os documentos da comunidade distinguem o que já foi implementado do backlog. Funcionalidades planejadas só passam para a documentação da API depois de implementadas e validadas.
 
 ## Executando localmente
 
@@ -56,14 +60,23 @@ Pré-requisitos:
 
 - JDK 21;
 - PostgreSQL;
+- variáveis `URL_DB`, `USER_DB` e `PASSWORD_DB` para conexão com o PostgreSQL;
 - variável `JWT_SECRET` com um segredo adequado para assinatura dos tokens;
 - variável `FRONTEND_URL` com a origem permitida pelo CORS.
 
-Por padrão, a aplicação usa o banco `devnest` em `localhost:5500`, com usuário e senha `devnest`. Esses valores estão em `src/main/resources/application.yaml`.
+Limites operacionais da comunidade podem ser sobrescritos por:
+
+- `COMMUNITY_POSTS_PER_24_HOURS`;
+- `COMMUNITY_COMMENTS_PER_MINUTE`;
+- `COMMUNITY_REACTIONS_PER_MINUTE`;
+- `COMMUNITY_DUPLICATE_WINDOW_MINUTES`.
 
 No Windows:
 
 ```powershell
+$env:URL_DB = "jdbc:postgresql://localhost:5432/devnest"
+$env:USER_DB = "devnest"
+$env:PASSWORD_DB = "substitua-por-uma-senha-segura"
 $env:JWT_SECRET = "substitua-por-um-segredo-seguro"
 $env:FRONTEND_URL = "http://localhost:5173"
 .\mvnw.cmd spring-boot:run
@@ -72,6 +85,9 @@ $env:FRONTEND_URL = "http://localhost:5173"
 Em Linux ou macOS:
 
 ```bash
+export URL_DB="jdbc:postgresql://localhost:5432/devnest"
+export USER_DB="devnest"
+export PASSWORD_DB="substitua-por-uma-senha-segura"
 export JWT_SECRET="substitua-por-um-segredo-seguro"
 export FRONTEND_URL="http://localhost:5173"
 ./mvnw spring-boot:run
@@ -86,6 +102,8 @@ Os testes usam H2 em memória, em modo de compatibilidade com PostgreSQL, e não
 ```powershell
 .\mvnw.cmd test
 ```
+
+Os cenários concorrentes de posts e reações também foram validados em PostgreSQL 16 descartável, com as migrations `V1` a `V11` aplicadas em ordem e o schema validado pelo Hibernate.
 
 ## Docker
 

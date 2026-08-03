@@ -27,9 +27,17 @@ public class AccessService {
 	}
 
 	public User getAuthenticatedAdmin() {
+		return getAuthenticatedAdmin("Only admins can manage community forums.");
+	}
+
+	public User getAuthenticatedModerator() {
+		return getAuthenticatedAdmin("Only admins can manage community resources.");
+	}
+
+	private User getAuthenticatedAdmin(String message) {
 		User user = getAuthenticatedUser();
 		if (user.getRole() != UserRole.ADMIN) {
-			throw new CommunityForbiddenException("Only admins can manage community forums.");
+			throw new CommunityForbiddenException(message);
 		}
 		return user;
 	}

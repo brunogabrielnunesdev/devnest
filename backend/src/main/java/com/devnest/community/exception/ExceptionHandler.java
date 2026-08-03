@@ -13,6 +13,8 @@ import com.devnest.community.exception.post.PostUnavailableException;
 import com.devnest.community.exception.ratelimit.CommunityRateLimitExceededException;
 import com.devnest.community.exception.reference.ReferenceNotFoundException;
 import com.devnest.community.exception.reaction.ReactionConflictException;
+import com.devnest.community.exception.report.ReportConflictException;
+import com.devnest.community.exception.report.ReportNotFoundException;
 import com.devnest.community.exception.slug.SlugConflictException;
 import com.devnest.community.exception.tag.TagNotFoundException;
 import com.devnest.community.exception.userrelation.SelfRelationException;
@@ -31,6 +33,7 @@ public class ExceptionHandler {
 			ForumNotFoundException.class,
 			CommentNotFoundException.class,
 			PostNotFoundException.class,
+			ReportNotFoundException.class,
 			TagNotFoundException.class,
 			ReferenceNotFoundException.class
 	})
@@ -49,7 +52,8 @@ public class ExceptionHandler {
 			PostUnavailableException.class,
 			ReactionConflictException.class,
 			SelfRelationException.class,
-			DuplicateContentException.class
+			DuplicateContentException.class,
+			ReportConflictException.class
 	})
 	public ResponseEntity<ApiError> handleConflict(
 			RuntimeException exception,
